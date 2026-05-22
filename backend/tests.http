@@ -10,11 +10,11 @@ POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-  "nom": "RAMALALATIANA",
-  "prenom": "Jocelyn",
-  "email": "jocy@gmail.com",
-  "mot_de_passe": "jocy2812",
-  "role": "etudiant"
+  "nom": "Avinirina",
+  "prenom": "Lucie",
+  "email": "admin@gmail.com",
+  "mot_de_passe": "admin1234",
+  "role": "admin"
 }
 
 ### ─── TEST 3 : Inscription enseignant ───────────────────────
