@@ -1,0 +1,77 @@
+### ─── Variables ─────────────────────────────────────────────
+@baseUrl = http://localhost:3000/api
+@token = COLLER_LE_TOKEN_ICI_APRES_LOGIN
+
+### ─── TEST 1 : Vérifier que le serveur tourne ───────────────
+GET http://localhost:3000
+
+### ─── TEST 2 : Inscription étudiant ────────────────────────
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "nom": "RAMALALATIANA",
+  "prenom": "Jocelyn",
+  "email": "jocy@gmail.com",
+  "mot_de_passe": "jocy2812",
+  "role": "etudiant"
+}
+
+### ─── TEST 3 : Inscription enseignant ───────────────────────
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "nom": "Monsieur",
+  "prenom": "Bakari",
+  "email": "bakari@gmail.com",
+  "mot_de_passe": "bakari111",
+  "role": "enseignant"
+}
+
+### ─── TEST 4 : Connexion admin ──────────────────────────────
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@univ.mg",
+  "mot_de_passe": "Password123"
+}
+
+### ─── TEST 5 : Connexion étudiant ──────────────────────────
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "jocy@gmail.com",
+  "mot_de_passe": "jocy2812"
+}
+
+### ─── TEST 6 : Email déjà utilisé (doit retourner 409) ─────
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "nom": "RAMALALATIANA",
+  "prenom": "Jackie",
+  "email": "jocy@gmail.com",
+  "mot_de_passe": "Password123",
+  "role": "etudiant"
+}
+
+### ─── TEST 7 : Mauvais mot de passe (doit retourner 401) ───
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "jocy@gmail.com",
+  "mot_de_passe": "mauvaismdp"
+}
+
+### ─── TEST 8 : Champs manquants (doit retourner 400) ───────
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "nom": "RAMALALATIANA"
+}

@@ -102,5 +102,5 @@ CREATE INDEX IF NOT EXISTS idx_equipements_statut
  
 -- ─── Message de confirmation ──────────────────────────────────
 DO $$ BEGIN
-  RAISE NOTICE '✅ Tables LabManager créées avec succès';
+  RAISE NOTICE 'Tables LabManager créées avec succès';
 END $$;
