@@ -1,6 +1,6 @@
 ### ─── Variables ─────────────────────────────────────────────
 @baseUrl = http://localhost:3000/api
-@token = COLLER_LE_TOKEN_ICI_APRES_LOGIN
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzc5NDE3NzU3LCJleHAiOjE3ODAwMjI1NTd9.jON3bHyyjCqB4ZLqufpJzfEMRGpOtiD-hYSXuwI8tBg
 
 ### ─── TEST 1 : Vérifier que le serveur tourne ───────────────
 GET http://localhost:3000
@@ -34,8 +34,8 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin@univ.mg",
-  "mot_de_passe": "Password123"
+  "email": "admin@gmail.com",
+  "mot_de_passe": "admin1234"
 }
 
 ### ─── TEST 5 : Connexion étudiant ──────────────────────────
@@ -75,3 +75,68 @@ Content-Type: application/json
 {
   "nom": "RAMALALATIANA"
 }
+
+
+### ════════════════════════════════════════════════════════════
+###  MODULE ÉQUIPEMENTS
+### ════════════════════════════════════════════════════════════
+
+### ─── TEST 9 : Lister tous les équipements ──────────────────
+GET {{baseUrl}}/equipements
+Authorization: Bearer {{token}}
+
+### ─── TEST 10 : Filtrer par type ordinateur ─────────────────
+GET {{baseUrl}}/equipements?type=ordinateur
+Authorization: Bearer {{token}}
+
+### ─── TEST 11 : Filtrer par statut disponible ───────────────
+GET {{baseUrl}}/equipements?statut=Disponible
+Authorization: Bearer {{token}}
+
+### ─── TEST 12 : Détail d'un équipement ─────────────────────
+GET {{baseUrl}}/equipements/1
+Authorization: Bearer {{token}}
+
+### ─── TEST 13 : Statistiques équipements ────────────────────
+GET {{baseUrl}}/equipements/stats
+Authorization: Bearer {{token}}
+
+### ─── TEST 14 : Créer un équipement (admin) ─────────────────
+POST {{baseUrl}}/equipements
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nom": "PC_09",
+  "type": "ordinateur",
+  "numero_serie": "SN-PC-009",
+  "date_acquisition": "2024-01-10",
+  "statut": "Disponible",
+  "description": "Nouveau poste de travail"
+}
+
+### ─── TEST 15 : Modifier un équipement (admin) ──────────────
+PUT {{baseUrl}}/equipements/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "Poste mis à jour"
+}
+
+### ─── TEST 16 : Changer le statut (admin) ───────────────────
+PATCH {{baseUrl}}/equipements/3/statut
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "statut": "En maintenance"
+}
+
+### ─── TEST 17 : Supprimer un équipement (admin) ─────────────
+DELETE {{baseUrl}}/equipements/9
+Authorization: Bearer {{token}}
+
+### ─── TEST 18 : Accès refusé sans token (doit retourner 401)
+GET {{baseUrl}}/equipements
+
