@@ -405,3 +405,38 @@ DELETE {{baseUrl}}/users/4
 Authorization: Bearer {{token}}
 
 
+
+### ════════════════════════════════════════════════════════════
+###  MODULE RAPPORTS & STATISTIQUES
+### ════════════════════════════════════════════════════════════
+
+### ─── TEST 51 : Tableau de bord global (admin) ──────────────
+GET {{baseUrl}}/rapports/dashboard
+Authorization: Bearer {{token}}
+
+### ─── TEST 52 : Taux d'occupation par période ───────────────
+GET {{baseUrl}}/rapports/occupation?date_debut=2026-01-01&date_fin=2026-12-31
+Authorization: Bearer {{token}}
+
+### ─── TEST 53 : Équipements les plus utilisés ───────────────
+GET {{baseUrl}}/rapports/equipements/utilises?limite=5
+Authorization: Bearer {{token}}
+
+### ─── TEST 54 : Équipements les plus défaillants ────────────
+GET {{baseUrl}}/rapports/equipements/defaillants?limite=5
+Authorization: Bearer {{token}}
+
+### ─── TEST 55 : Réservations par utilisateur ────────────────
+GET {{baseUrl}}/rapports/utilisateurs
+Authorization: Bearer {{token}}
+
+### ─── TEST 56 : Statistiques personnelles ──────────────────
+GET {{baseUrl}}/rapports/mes-stats
+Authorization: Bearer {{token}}
+
+### ─── TEST 57 : Export CSV des réservations ─────────────────
+GET {{baseUrl}}/rapports/export/csv?date_debut=2026-01-01&date_fin=2026-12-31
+Authorization: Bearer {{token}}
+
+
+
