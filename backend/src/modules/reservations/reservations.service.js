@@ -1,5 +1,7 @@
 
 const pool = require('../../config/db');
+const notificationsService = require('../notifications/notifications.service');
+
  
 // ─── Vérification de conflit de réservation ───────────────────────────────────
 // Règle R1 : Un équipement ne peut pas avoir deux réservations qui se chevauchent
@@ -253,6 +255,8 @@ const valider = async (id, statut, admin_id) => {
     `UPDATE reservations SET statut = $1 WHERE id_reservation = $2 RETURNING *`,
     [statut, id]
   );
+   // 🔔 Notification
+  await notificationsService.notifierStatutReservation(id, statut);
  
   // Règle R3 : Si confirmée → équipements passent en "En cours d'utilisation"
   if (statut === 'Confirmée') {

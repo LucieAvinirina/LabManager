@@ -1,5 +1,6 @@
 
 const pool = require('../../config/db');
+const notificationsService = require('../notifications/notifications.service');
  
 // ─── Lister tous les incidents ────────────────────────────────────────────────
 const getAll = async (filters = {}, user) => {
