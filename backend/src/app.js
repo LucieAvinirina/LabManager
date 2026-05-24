@@ -19,6 +19,7 @@ app.use('/api/equipements',  require('./modules/equipements/equipements.routes')
 app.use('/api/reservations', require('./modules/reservations/reservations.routes'));
 app.use('/api/incidents',    require('./modules/incidents/incidents.routes'));
 app.use('/api/rapports',     require('./modules/rapports/rapports.routes'));
+app.use('/api/notifications', require('./modules/notifications/notifications.routes'));
  
 // ─── Route de test ────────────────────────────────────────────────────────────
 app.get('/', (req, res) => {
@@ -38,13 +39,13 @@ app.get('/', (req, res) => {
  
 // ─── Gestion des routes inexistantes ──────────────────────────────────────────
 app.use((req, res) => {
-  res.status(404).json({ message: '❌ Route non trouvée' });
+  res.status(404).json({ message: ' Route non trouvée' });
 });
  
 // ─── Gestion globale des erreurs ──────────────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error('Erreur serveur :', err.message);
-  res.status(500).json({ message: '❌ Erreur interne du serveur' });
+  res.status(500).json({ message: ' Erreur interne du serveur' });
 });
  
 module.exports = app;

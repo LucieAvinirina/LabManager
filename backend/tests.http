@@ -1,7 +1,6 @@
 ### ─── Variables ─────────────────────────────────────────────
 @baseUrl = http://localhost:3000/api
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJqb2N5QGdtYWlsLmNvbSIsInJvbGUiOiJldHVkaWFudCIsImlhdCI6MTc3OTU5NzM1MCwiZXhwIjoxNzgwMjAyMTUwfQ.kTKi8ywEsn1PVvqmDXuYIMTzlNmQfTXQldR6rKgfmdU
-
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzc5NjEyMTA2LCJleHAiOjE3ODAyMTY5MDZ9.eQToChj_IRSgYsoTXgdGwBLVqhupAhpTvAwTla-3-P4
 ### ─── TEST 1 : Vérifier que le serveur tourne ───────────────
 GET http://localhost:3000
 
@@ -293,5 +292,38 @@ Content-Type: application/json
 {
   "id_equipement": 1,
   "description": "Panne"
+}
+
+
+### ════════════════════════════════════════════════════════════
+###  MODULE NOTIFICATIONS
+### ════════════════════════════════════════════════════════════
+
+### ─── TEST 38 : Notification générale à tous (admin) ────────
+POST {{baseUrl}}/notifications/all
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": " Fermeture exceptionnelle",
+  "body": "Le laboratoire sera fermé demain pour maintenance. Toutes les réservations sont annulées.",
+  "data": {
+    "type": "annonce"
+  }
+}
+
+### ─── TEST 39 : Notification à un utilisateur (admin) ───────
+POST {{baseUrl}}/notifications/user
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id_utilisateur": 3,
+  "title": "Votre réservation est confirmée",
+  "body": "Votre réservation du 01/06/2026 à 08h00 a été validée.",
+  "data": {
+    "type": "reservation",
+    "id_reservation": "1"
+  }
 }
 
