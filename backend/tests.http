@@ -1,6 +1,6 @@
 ### ─── Variables ─────────────────────────────────────────────
 @baseUrl = http://localhost:3000/api
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzc5NjEyMTA2LCJleHAiOjE3ODAyMTY5MDZ9.eQToChj_IRSgYsoTXgdGwBLVqhupAhpTvAwTla-3-P4
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJqb2N5QGdtYWlsLmNvbSIsInJvbGUiOiJldHVkaWFudCIsImlhdCI6MTc3OTY2NjA1NiwiZXhwIjoxNzgwMjcwODU2fQ.ynH6kBhhzyEedaTQjIRtz7N1U_qydnArrILg3v_Vr44
 ### ─── TEST 1 : Vérifier que le serveur tourne ───────────────
 GET http://localhost:3000
 
@@ -326,4 +326,82 @@ Content-Type: application/json
     "id_reservation": "1"
   }
 }
+
+
+
+### ════════════════════════════════════════════════════════════
+###  MODULE USERS
+### ════════════════════════════════════════════════════════════
+
+### ─── TEST 40 : Voir son propre profil ──────────────────────
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{token}}
+
+### ─── TEST 41 : Modifier son propre profil ──────────────────
+PUT {{baseUrl}}/users/profile
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nom": "Avinirina",
+  "prenom": "Lucie"
+}
+
+### ─── TEST 42 : Changer son mot de passe ────────────────────
+PUT {{baseUrl}}/users/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "ancien_mot_de_passe": "Password123",
+  "nouveau_mot_de_passe": "NouveauMdp123"
+}
+
+### ─── TEST 43 : Lister tous les utilisateurs (admin) ────────
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+
+### ─── TEST 44 : Filtrer par rôle étudiant ───────────────────
+GET {{baseUrl}}/users?role=etudiant
+Authorization: Bearer {{token}}
+
+### ─── TEST 45 : Statistiques utilisateurs (admin) ──────────
+GET {{baseUrl}}/users/stats
+Authorization: Bearer {{token}}
+
+### ─── TEST 46 : Détail d'un utilisateur (admin) ────────────
+GET {{baseUrl}}/users/2
+Authorization: Bearer {{token}}
+
+### ─── TEST 47 : Modifier un utilisateur (admin) ─────────────
+PUT {{baseUrl}}/users/3
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "role": "enseignant"
+}
+
+### ─── TEST 48 : Désactiver un compte (admin) ────────────────
+PATCH {{baseUrl}}/users/4/actif
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "est_actif": false
+}
+
+### ─── TEST 49 : Réactiver un compte (admin) ─────────────────
+PATCH {{baseUrl}}/users/4/actif
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "est_actif": true
+}
+
+### ─── TEST 50 : Supprimer un utilisateur (admin) ────────────
+DELETE {{baseUrl}}/users/4
+Authorization: Bearer {{token}}
+
 
