@@ -1,6 +1,6 @@
 ### ─── Variables ─────────────────────────────────────────────
 @baseUrl = http://localhost:3000/api
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzc5NDE3NzU3LCJleHAiOjE3ODAwMjI1NTd9.jON3bHyyjCqB4ZLqufpJzfEMRGpOtiD-hYSXuwI8tBg
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJqb2N5QGdtYWlsLmNvbSIsInJvbGUiOiJldHVkaWFudCIsImlhdCI6MTc3OTU5NzM1MCwiZXhwIjoxNzgwMjAyMTUwfQ.kTKi8ywEsn1PVvqmDXuYIMTzlNmQfTXQldR6rKgfmdU
 
 ### ─── TEST 1 : Vérifier que le serveur tourne ───────────────
 GET http://localhost:3000
@@ -130,7 +130,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "statut": "En maintenance"
+  "statut": "Disponible"
 }
 
 ### ─── TEST 17 : Supprimer un équipement (admin) ─────────────
@@ -140,3 +140,81 @@ Authorization: Bearer {{token}}
 ### ─── TEST 18 : Accès refusé sans token (doit retourner 401)
 GET {{baseUrl}}/equipements
 
+
+
+
+### ════════════════════════════════════════════════════════════
+###  MODULE RÉSERVATIONS
+### ════════════════════════════════════════════════════════════
+
+### ─── TEST 19 : Lister toutes les réservations ──────────────
+GET {{baseUrl}}/reservations
+Authorization: Bearer {{token}}
+
+### ─── TEST 20 : Filtrer par statut En attente ───────────────
+GET {{baseUrl}}/reservations?statut=En attente
+Authorization: Bearer {{token}}
+
+### ─── TEST 21 : Réserver un poste individuel ────────────────
+POST {{baseUrl}}/reservations
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "ids_equipements": [1],
+  "date_heure_debut": "2026-06-01T08:00:00",
+  "date_heure_fin": "2026-06-01T10:00:00",
+  "type_reservation": "poste",
+  "motif": "Projet de programmation"
+}
+
+### ─── TEST 22 : Réserver la salle entière (enseignant) ──────
+POST {{baseUrl}}/reservations
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "date_heure_debut": "2026-06-02T08:00:00",
+  "date_heure_fin": "2026-06-02T12:00:00",
+  "type_reservation": "salle_entiere",
+  "motif": "TP Réseau L3"
+}
+
+### ─── TEST 23 : Valider une réservation (admin) ─────────────
+PATCH {{baseUrl}}/reservations/1/valider
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "statut": "Confirmée"
+}
+
+### ─── TEST 24 : Refuser une réservation (admin) ─────────────
+PATCH {{baseUrl}}/reservations/2/valider
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "statut": "Annulée"
+}
+
+### ─── TEST 25 : Annuler sa propre réservation ───────────────
+PATCH {{baseUrl}}/reservations/1/annuler
+Authorization: Bearer {{token}}
+
+### ─── TEST 26 : Historique personnel ───────────────────────
+GET {{baseUrl}}/reservations/historique
+Authorization: Bearer {{token}}
+
+### ─── TEST 27 : Conflit de réservation (doit retourner 409)
+POST {{baseUrl}}/reservations
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "ids_equipements": [1],
+  "date_heure_debut": "2026-06-01T08:00:00",
+  "date_heure_fin": "2026-06-01T10:00:00",
+  "type_reservation": "poste",
+  "motif": "Test conflit"
+}
