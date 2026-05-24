@@ -218,3 +218,80 @@ Content-Type: application/json
   "type_reservation": "poste",
   "motif": "Test conflit"
 }
+
+
+
+### ════════════════════════════════════════════════════════════
+###  MODULE INCIDENTS
+### ════════════════════════════════════════════════════════════
+
+### ─── TEST 28 : Lister tous les incidents ───────────────────
+GET {{baseUrl}}/incidents
+Authorization: Bearer {{token}}
+
+### ─── TEST 29 : Filtrer incidents par statut ────────────────
+GET {{baseUrl}}/incidents?statut=Nouveau
+Authorization: Bearer {{token}}
+
+### ─── TEST 30 : Signaler un incident ────────────────────────
+POST {{baseUrl}}/incidents
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id_equipement": 1,
+  "description": "L'écran du PC_01 ne s'allume plus depuis ce matin",
+  "photo_url": null
+}
+
+### ─── TEST 31 : Signaler un incident avec photo ─────────────
+POST {{baseUrl}}/incidents
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id_equipement": 2,
+  "description": "Le clavier du PC_02 a plusieurs touches qui ne fonctionnent pas",
+  "photo_url": "https://firebase.storage/photos/incident_pc02.jpg"
+}
+
+### ─── TEST 32 : Détail d'un incident ────────────────────────
+GET {{baseUrl}}/incidents/1
+Authorization: Bearer {{token}}
+
+### ─── TEST 33 : Incidents d'un équipement ───────────────────
+GET {{baseUrl}}/incidents/equipement/1
+Authorization: Bearer {{token}}
+
+### ─── TEST 34 : Statistiques incidents (admin) ─────────────
+GET {{baseUrl}}/incidents/stats
+Authorization: Bearer {{token}}
+
+### ─── TEST 35 : Passer en cours de traitement (admin) ──────
+PATCH {{baseUrl}}/incidents/1/statut
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "statut": "En cours de traitement"
+}
+
+### ─── TEST 36 : Résoudre un incident (admin) ────────────────
+PATCH {{baseUrl}}/incidents/1/statut
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "statut": "Résolu"
+}
+
+### ─── TEST 37 : Description trop courte (doit retourner 400)
+POST {{baseUrl}}/incidents
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id_equipement": 1,
+  "description": "Panne"
+}
+
