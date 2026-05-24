@@ -119,6 +119,11 @@ const create = async ({ id_equipement, id_utilisateur, description, photo_url })
     `, [id_equipement]);
  
     await client.query('COMMIT');
+    // 🔔 Notification après création incident
+await notificationsService.notifierNouvelIncident(
+  result.rows[0].id_incident,
+  eq.rows[0].nom
+);
     return result.rows[0];
  
   } catch (error) {
