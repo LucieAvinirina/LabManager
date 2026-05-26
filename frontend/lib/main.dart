@@ -9,10 +9,14 @@ import 'features/incidents/presentation/providers/incidents_provider.dart';
  
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
- 
-  // Initialiser Firebase
-  await Firebase.initializeApp();
- 
+
+  // ─── Initialiser Firebase seulement sur mobile ────────────
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    print('Firebase non initialisé : $e');
+  }
+
   runApp(
     MultiProvider(
       providers: [
