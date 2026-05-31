@@ -25,7 +25,6 @@ class EquipementsProvider extends ChangeNotifier {
   Future<void> loadAll({String? type, String? statut}) async {
     _status = EquipementsStatus.loading;
     notifyListeners();
- 
     try {
       _equipements = await _repository.getAll(
         type:   type   ?? _filterType,
@@ -43,7 +42,6 @@ class EquipementsProvider extends ChangeNotifier {
   Future<void> loadById(int id) async {
     _status = EquipementsStatus.loading;
     notifyListeners();
- 
     try {
       _selected = await _repository.getById(id);
       _status   = EquipementsStatus.loaded;
@@ -71,6 +69,23 @@ class EquipementsProvider extends ChangeNotifier {
   Future<bool> updateStatut(int id, String statut) async {
     try {
       final updated = await _repository.updateStatut(id, statut);
+      final index   = _equipements.indexWhere((e) => e.idEquipement == id);
+      if (index != -1) {
+        _equipements[index] = updated;
+        notifyListeners();
+      }
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
+      return false;
+    }
+  }
+ 
+  // ─── Modifier un équipement (admin) ───────────────────────
+  Future<bool> update(int id, Map<String, dynamic> data) async {
+    try {
+      final updated = await _repository.update(id, data);
       final index   = _equipements.indexWhere((e) => e.idEquipement == id);
       if (index != -1) {
         _equipements[index] = updated;
@@ -112,4 +127,3 @@ class EquipementsProvider extends ChangeNotifier {
     }
   }
 }
- 

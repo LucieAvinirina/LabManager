@@ -6,6 +6,7 @@ import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/equipements/presentation/providers/equipements_provider.dart';
 import 'features/reservations/presentation/providers/reservations_provider.dart';
 import 'features/incidents/presentation/providers/incidents_provider.dart';
+import 'package:intl/date_symbol_data_local.dart'; // ← AJOUTER cet import
  
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

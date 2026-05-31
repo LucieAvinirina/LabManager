@@ -16,10 +16,8 @@ class EquipementsRepository {
         AppEndpoints.equipements,
         params: params,
       );
- 
       final List data = response.data['data'];
       return data.map((e) => EquipementModel.fromJson(e)).toList();
- 
     } on DioException catch (e) {
       throw Exception(e.response?.data['message'] ?? 'Erreur chargement équipements');
     }
@@ -35,6 +33,29 @@ class EquipementsRepository {
     }
   }
  
+  // ─── Créer un équipement (admin) ───────────────────────────
+  Future<EquipementModel> create(Map<String, dynamic> data) async {
+    try {
+      final response = await ApiClient.post(AppEndpoints.equipements, data: data);
+      return EquipementModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Erreur création équipement');
+    }
+  }
+ 
+  // ─── Modifier un équipement (admin) ───────────────────────
+  Future<EquipementModel> update(int id, Map<String, dynamic> data) async {
+    try {
+      final response = await ApiClient.put(
+        '${AppEndpoints.equipements}/$id',
+        data: data,
+      );
+      return EquipementModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Erreur modification équipement');
+    }
+  }
+ 
   // ─── Changer le statut (admin) ─────────────────────────────
   Future<EquipementModel> updateStatut(int id, String statut) async {
     try {
@@ -45,16 +66,6 @@ class EquipementsRepository {
       return EquipementModel.fromJson(response.data['data']);
     } on DioException catch (e) {
       throw Exception(e.response?.data['message'] ?? 'Erreur mise à jour statut');
-    }
-  }
- 
-  // ─── Créer un équipement (admin) ───────────────────────────
-  Future<EquipementModel> create(Map<String, dynamic> data) async {
-    try {
-      final response = await ApiClient.post(AppEndpoints.equipements, data: data);
-      return EquipementModel.fromJson(response.data['data']);
-    } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Erreur création équipement');
     }
   }
  
