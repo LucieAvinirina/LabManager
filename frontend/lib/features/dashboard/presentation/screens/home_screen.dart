@@ -30,53 +30,62 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
   }
  
-  List<BottomNavigationBarItem> _getNavItems(bool isAdmin) {
+  // ─── Items de navigation selon le rôle ───────────────────
+  List<NavigationDestination> _getNavItems(bool isAdmin) {
     return [
       if (isAdmin)
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.dashboard_outlined),
-          activeIcon: Icon(Icons.dashboard),
-          label: 'Dashboard',
+        const NavigationDestination(
+          icon:           Icon(Icons.dashboard_outlined),
+          selectedIcon:   Icon(Icons.dashboard),
+          label:          'Dashboard',
         ),
-      const BottomNavigationBarItem(
-        icon: Icon(Icons.computer_outlined),
-        activeIcon: Icon(Icons.computer),
-        label: AppStrings.equipements,
+      const NavigationDestination(
+        icon:           Icon(Icons.computer_outlined),
+        selectedIcon:   Icon(Icons.computer),
+        label:          'Équipements',
       ),
-      const BottomNavigationBarItem(
-        icon: Icon(Icons.event_outlined),
-        activeIcon: Icon(Icons.event),
-        label: AppStrings.reservations,
+      const NavigationDestination(
+        icon:           Icon(Icons.event_outlined),
+        selectedIcon:   Icon(Icons.event),
+        label:          'Réservations',
       ),
-      const BottomNavigationBarItem(
-        icon: Icon(Icons.warning_outlined),
-        activeIcon: Icon(Icons.warning),
-        label: 'Incidents',
+      const NavigationDestination(
+        icon:           Icon(Icons.warning_amber_outlined),
+        selectedIcon:   Icon(Icons.warning_amber),
+        label:          'Incidents',
       ),
-      const BottomNavigationBarItem(
-        icon: Icon(Icons.person_outlined),
-        activeIcon: Icon(Icons.person),
-        label: AppStrings.profil,
+      const NavigationDestination(
+        icon:           Icon(Icons.person_outline),
+        selectedIcon:   Icon(Icons.person),
+        label:          'Profil',
       ),
     ];
   }
  
   @override
   Widget build(BuildContext context) {
-    final user    = context.watch<AuthProvider>().user;
-    final isAdmin = user?.isAdmin ?? false;
-    final pages   = _getPages(isAdmin);
+    final user     = context.watch<AuthProvider>().user;
+    final isAdmin  = user?.isAdmin ?? false;
+    final pages    = _getPages(isAdmin);
     final navItems = _getNavItems(isAdmin);
+ 
+    // S'assurer que l'index ne dépasse pas le nombre de pages
+    final safeIndex = _currentIndex.clamp(0, pages.length - 1);
  
     return Scaffold(
       body: IndexedStack(
-        index: _currentIndex.clamp(0, pages.length - 1),
+        index: safeIndex,
         children: pages,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex.clamp(0, navItems.length - 1),
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: navItems,
+      bottomNavigationBar: NavigationBar(
+        selectedIndex:    safeIndex,
+        onDestinationSelected: (index) {
+          setState(() => _currentIndex = index);
+        },
+        backgroundColor: AppColors.white,
+        indicatorColor:  AppColors.primary.withOpacity(0.15),
+        labelBehavior:   NavigationDestinationLabelBehavior.alwaysShow,
+        destinations:    navItems,
       ),
     );
   }
@@ -113,12 +122,13 @@ class _ProfilePage extends StatelessWidget {
             const SizedBox(height: 16),
  
             // ─── Nom et rôle ──────────────────────────────
-            Text(user?.fullName ?? '',
-                style: Theme.of(context).textTheme.headlineMedium),
+            Text(
+              user?.fullName ?? '',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
             const SizedBox(height: 8),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
                 color: AppColors.primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
@@ -130,8 +140,10 @@ class _ProfilePage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Text(user?.email ?? '',
-                style: const TextStyle(color: AppColors.textSecondary)),
+            Text(
+              user?.email ?? '',
+              style: const TextStyle(color: AppColors.textSecondary),
+            ),
             const SizedBox(height: 32),
  
             // ─── Options ──────────────────────────────────
@@ -187,3 +199,4 @@ class _ProfilePage extends StatelessWidget {
     );
   }
 }
+ 

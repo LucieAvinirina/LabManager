@@ -73,39 +73,55 @@ class _EquipementsScreenState extends State<EquipementsScreen> {
     );
   }
  
-  // ─── Chips de filtre rapide ────────────────────────────────
-  Widget _buildStatutChips() {
-    return SizedBox(
-      height: 50,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        children: _statuts.map((statut) {
-          final isSelected = (statut == 'Tous' && _selectedStatut == null) ||
-                             statut == _selectedStatut;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: Text(statut),
-              selected: isSelected,
-              selectedColor: AppColors.primary.withOpacity(0.2),
-              checkmarkColor: AppColors.primary,
-              onSelected: (_) {
-                setState(() {
-                  _selectedStatut = statut == 'Tous' ? null : statut;
-                });
-                context.read<EquipementsProvider>().setFilter(
-                  statut: _selectedStatut,
-                  type:   _selectedType,
-                );
-              },
+  // ─── Chips de filtre — Wrap pour éviter les coupures ──────
+Widget _buildStatutChips() {
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+    child: Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: _statuts.map((statut) {
+        final isSelected = (statut == 'Tous' && _selectedStatut == null) ||
+                           statut == _selectedStatut;
+
+        final color = statut == 'Tous'
+            ? AppColors.primary
+            : AppColors.getStatutEquipementColor(statut);
+
+        return FilterChip(
+          label: Text(
+            statut,
+            style: TextStyle(
+              fontSize: 12,
+              color: isSelected ? color : AppColors.textPrimary,
+              fontWeight: isSelected
+                  ? FontWeight.bold
+                  : FontWeight.normal,
             ),
-          );
-        }).toList(),
-      ),
-    );
-  }
- 
+          ),
+          selected: isSelected,
+          selectedColor: color.withOpacity(0.15),
+          checkmarkColor: color,
+          backgroundColor: Colors.white,
+          side: BorderSide(
+            color: isSelected ? color : AppColors.divider,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          onSelected: (_) {
+            setState(() {
+              _selectedStatut = statut == 'Tous' ? null : statut;
+            });
+            context.read<EquipementsProvider>().setFilter(
+              statut: _selectedStatut,
+              type:   _selectedType,
+            );
+          },
+        );
+      }).toList(),
+    ),
+  );
+}
   // ─── Liste des équipements ─────────────────────────────────
   Widget _buildList() {
     return Consumer<EquipementsProvider>(
