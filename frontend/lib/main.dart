@@ -10,6 +10,7 @@ import 'package:intl/date_symbol_data_local.dart'; // ← AJOUTER cet import
  
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('fr_FR', null);
 
   // ─── Initialiser Firebase seulement sur mobile ────────────
   try {

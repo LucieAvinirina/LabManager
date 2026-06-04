@@ -15,13 +15,14 @@ class ReservationFormScreen extends StatefulWidget {
 }
  
 class _ReservationFormScreenState extends State<ReservationFormScreen> {
-  final _formKey       = GlobalKey<FormState>();
-  final _motifCtrl     = TextEditingController();
-  DateTime?  _dateDebut;
-  DateTime?  _dateFin;
-  String     _typeReservation = 'poste';
-  bool       _estRecurrente   = false;
-  List<int>  _selectedIds     = [];
+  final _formKey   = GlobalKey<FormState>();
+  final _motifCtrl = TextEditingController();
+ 
+  DateTime? _dateDebut;
+  DateTime? _dateFin;
+  String    _typeReservation = 'poste';
+  bool      _estRecurrente   = false;
+  List<int> _selectedIds     = [];
  
   @override
   void initState() {
@@ -37,7 +38,7 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
     super.dispose();
   }
  
-  // ─── Sélectionner la date/heure ───────────────────────────
+  // ─── Sélectionner date + heure ────────────────────────────
   Future<DateTime?> _pickDateTime(BuildContext context) async {
     final date = await showDatePicker(
       context: context,
@@ -45,7 +46,7 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 90)),
     );
-    if (date == null) return null;
+    if (date == null || !context.mounted) return null;
  
     final time = await showTimePicker(
       context: context,
@@ -62,8 +63,21 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
  
     if (_dateDebut == null || _dateFin == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez choisir les dates'),
-            backgroundColor: AppColors.error),
+        const SnackBar(
+          content: Text('Veuillez choisir les dates'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+ 
+    if (_dateFin!.isBefore(_dateDebut!) ||
+        _dateFin!.isAtSameMomentAs(_dateDebut!)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('La date de fin doit être après la date de début'),
+          backgroundColor: AppColors.error,
+        ),
       );
       return;
     }
@@ -71,18 +85,19 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
     if (_typeReservation == 'poste' && _selectedIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Sélectionnez au moins un équipement'),
-            backgroundColor: AppColors.error),
+          content: Text('Sélectionnez au moins un équipement'),
+          backgroundColor: AppColors.error,
+        ),
       );
       return;
     }
  
     final data = <String, dynamic>{
-      'date_heure_debut':  _dateDebut!.toIso8601String(),
-      'date_heure_fin':    _dateFin!.toIso8601String(),
-      'type_reservation':  _typeReservation,
-      'est_recurrente':    _estRecurrente,
-      'motif':             _motifCtrl.text.trim(),
+      'date_heure_debut': _dateDebut!.toIso8601String(),
+      'date_heure_fin':   _dateFin!.toIso8601String(),
+      'type_reservation': _typeReservation,
+      'est_recurrente':   _estRecurrente,
+      'motif':            _motifCtrl.text.trim(),
     };
  
     if (_typeReservation == 'poste') {
@@ -107,9 +122,13 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
  
   @override
   Widget build(BuildContext context) {
-    final fmt          = DateFormat('dd/MM/yyyy HH:mm');
     final user         = context.read<AuthProvider>().user;
     final isEnseignant = user?.isEnseignant ?? false;
+    final isAdmin      = user?.isAdmin      ?? false;
+    final fmt          = DateFormat('dd/MM/yyyy HH:mm');
+ 
+    // Admin et enseignant peuvent réserver la salle entière
+    final canReserveSalle = isEnseignant || isAdmin;
  
     return Scaffold(
       appBar: AppBar(title: const Text('Nouvelle réservation')),
@@ -122,19 +141,18 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
             children: [
  
               // ─── Type de réservation ──────────────────────
-              if (isEnseignant) ...[
+              if (canReserveSalle) ...[
                 const Text('Type de réservation',
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
-                      child: _typeButton('poste', '💻 Poste individuel'),
-                    ),
+                        child: _typeButton('poste', '💻 Poste individuel')),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: _typeButton('salle_entiere', '🏫 Salle entière'),
-                    ),
+                        child: _typeButton(
+                            'salle_entiere', '🏫 Salle entière')),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -209,14 +227,29 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                 const SizedBox(height: 8),
                 Consumer<EquipementsProvider>(
                   builder: (_, eqProvider, __) {
+                    if (eqProvider.isLoading) {
+                      return const Center(
+                          child: CircularProgressIndicator());
+                    }
+ 
                     final ordinateurs = eqProvider.equipements
                         .where((e) => e.type == 'ordinateur')
                         .toList();
+ 
                     if (ordinateurs.isEmpty) {
-                      return const Text('Aucun ordinateur disponible',
-                          style:
-                              TextStyle(color: AppColors.textSecondary));
+                      return Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.warning.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'Aucun ordinateur disponible actuellement',
+                          style: TextStyle(color: AppColors.warning),
+                        ),
+                      );
                     }
+ 
                     return Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -226,8 +259,14 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                         return FilterChip(
                           label: Text(eq.nom),
                           selected: selected,
-                          selectedColor: AppColors.primary.withOpacity(0.2),
+                          selectedColor:
+                              AppColors.primary.withOpacity(0.2),
                           checkmarkColor: AppColors.primary,
+                          avatar: Icon(eq.typeIcon,
+                              size: 16,
+                              color: selected
+                                  ? AppColors.primary
+                                  : AppColors.textSecondary),
                           onSelected: (_) {
                             setState(() {
                               if (selected) {
@@ -251,19 +290,52 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                 decoration: const InputDecoration(
                   labelText: 'Motif (optionnel)',
                   prefixIcon: Icon(Icons.notes_outlined),
+                  hintText: 'Ex: Projet de fin d\'études, TP Réseau...',
                 ),
                 maxLines: 2,
               ),
               const SizedBox(height: 16),
  
-              // ─── Récurrence (enseignant seulement) ────────
-              if (isEnseignant) ...[
-                SwitchListTile(
-                  title: const Text('Réservation récurrente'),
-                  subtitle: const Text('Se répète chaque semaine'),
-                  value: _estRecurrente,
-                  activeColor: AppColors.primary,
-                  onChanged: (val) => setState(() => _estRecurrente = val),
+              // ─── Récurrence (enseignant + admin) ──────────
+              if (canReserveSalle) ...[
+                Card(
+                  child: SwitchListTile(
+                    title: const Text('Réservation récurrente'),
+                    subtitle:
+                        const Text('Se répète chaque semaine même créneau'),
+                    value: _estRecurrente,
+                    activeColor: AppColors.primary,
+                    secondary: const Icon(Icons.repeat,
+                        color: AppColors.primary),
+                    onChanged: (val) =>
+                        setState(() => _estRecurrente = val),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+ 
+              // ─── Info admin ───────────────────────────────
+              if (isAdmin) ...[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                        color: AppColors.primary.withOpacity(0.3)),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.info_outline, color: AppColors.primary),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'En tant qu\'admin, votre réservation sera confirmée automatiquement.',
+                          style: TextStyle(color: AppColors.primary),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 16),
               ],
@@ -278,7 +350,8 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                             width: 18,
                             height: 18,
                             child: CircularProgressIndicator(
-                                color: Colors.white, strokeWidth: 2))
+                                color: Colors.white, strokeWidth: 2),
+                          )
                         : const Icon(Icons.send),
                     label: const Text('Soumettre la réservation'),
                   );
@@ -295,20 +368,26 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
   Widget _typeButton(String value, String label) {
     final selected = _typeReservation == value;
     return GestureDetector(
-      onTap: () => setState(() => _typeReservation = value),
+      onTap: () {
+        setState(() {
+          _typeReservation = value;
+          _selectedIds     = []; // Reset sélection
+        });
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          color:         selected ? AppColors.primary : Colors.white,
+          borderRadius:  BorderRadius.circular(12),
           border: Border.all(
-              color: selected ? AppColors.primary : AppColors.divider),
+            color: selected ? AppColors.primary : AppColors.divider,
+          ),
         ),
         child: Text(
           label,
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: selected ? Colors.white : AppColors.textPrimary,
+            color:      selected ? Colors.white : AppColors.textPrimary,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -316,3 +395,4 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
     );
   }
 }
+ 

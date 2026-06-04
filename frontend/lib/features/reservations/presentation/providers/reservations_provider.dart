@@ -7,10 +7,10 @@ enum ReservationsStatus { initial, loading, loaded, error }
 class ReservationsProvider extends ChangeNotifier {
   final ReservationsRepository _repository = ReservationsRepository();
  
-  ReservationsStatus        _status       = ReservationsStatus.initial;
-  List<ReservationModel>    _reservations = [];
-  List<ReservationModel>    _historique   = [];
-  String                    _errorMessage = '';
+  ReservationsStatus     _status       = ReservationsStatus.initial;
+  List<ReservationModel> _reservations = [];
+  List<ReservationModel> _historique   = [];
+  String                 _errorMessage = '';
  
   ReservationsStatus     get status       => _status;
   List<ReservationModel> get reservations => _reservations;
@@ -18,7 +18,7 @@ class ReservationsProvider extends ChangeNotifier {
   String                 get errorMessage => _errorMessage;
   bool                   get isLoading    => _status == ReservationsStatus.loading;
  
-  // ─── Charger les réservations ──────────────────────────────
+  // ─── Charger les réservations en cours ────────────────────
   Future<void> loadAll({String? statut, String? date}) async {
     _status = ReservationsStatus.loading;
     notifyListeners();
@@ -32,13 +32,24 @@ class ReservationsProvider extends ChangeNotifier {
     notifyListeners();
   }
  
-  // ─── Charger l'historique ──────────────────────────────────
-  Future<void> loadHistorique() async {
+  // ─── Charger l'historique selon le rôle ───────────────────
+  // Admin       → TOUT l'historique de TOUS les utilisateurs
+  // Etudiant/Prof → seulement leur propre historique
+  Future<void> loadHistorique({bool isAdmin = false}) async {
     _status = ReservationsStatus.loading;
     notifyListeners();
+ 
     try {
-      _historique = await _repository.getHistorique();
-      _status     = ReservationsStatus.loaded;
+      if (isAdmin) {
+        // Admin voit TOUTES les réservations (tous statuts, tous users)
+        final toutes = await _repository.getAll();
+        _historique = toutes
+          ..sort((a, b) => b.dateHeureDebut.compareTo(a.dateHeureDebut));
+      } else {
+        // Étudiant/Enseignant voit son propre historique
+        _historique = await _repository.getHistorique();
+      }
+      _status = ReservationsStatus.loaded;
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
       _status       = ReservationsStatus.error;
@@ -46,7 +57,7 @@ class ReservationsProvider extends ChangeNotifier {
     notifyListeners();
   }
  
-  // ─── Créer une réservation ─────────────────────────────────
+  // ─── Créer une réservation (tous les rôles) ───────────────
   Future<bool> create(Map<String, dynamic> data) async {
     try {
       final newRes = await _repository.create(data);
@@ -60,7 +71,7 @@ class ReservationsProvider extends ChangeNotifier {
     }
   }
  
-  // ─── Valider (admin) ───────────────────────────────────────
+  // ─── Valider ou refuser (admin) ────────────────────────────
   Future<bool> valider(int id, String statut) async {
     try {
       await _repository.valider(id, statut);
@@ -86,4 +97,3 @@ class ReservationsProvider extends ChangeNotifier {
     }
   }
 }
- 
