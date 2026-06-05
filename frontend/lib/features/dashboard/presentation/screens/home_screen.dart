@@ -9,15 +9,25 @@ import '../../../reservations/presentation/screens/mes_reservations_screen.dart'
 import '../../../incidents/presentation/screens/incidents_screen.dart';
 import 'admin_dashboard_screen.dart';
  
+// ─────────────────────────────────────────────────────────────────────────────
+// HomeScreen — Shell de navigation avec BottomNavigationBar
+// Expose _HomeScreenState pour permettre la navigation depuis le Dashboard
+// ─────────────────────────────────────────────────────────────────────────────
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
  
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => HomeScreenState();
 }
  
-class _HomeScreenState extends State<HomeScreen> {
+// Classe publique pour que AdminDashboardScreen puisse y accéder
+class HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+ 
+  // ─── Naviguer vers un onglet donné (appelé depuis le Dashboard) ──
+  void navigateTo(int index) {
+    setState(() => _currentIndex = index);
+  }
  
   // ─── Pages selon le rôle ──────────────────────────────────
   List<Widget> _getPages(bool isAdmin) {
@@ -26,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
       const EquipementsScreen(),
       const MesReservationsScreen(),
       const IncidentsScreen(),
-      _ProfilePage(),
+      const _ProfilePage(),
     ];
   }
  
@@ -35,29 +45,29 @@ class _HomeScreenState extends State<HomeScreen> {
     return [
       if (isAdmin)
         const NavigationDestination(
-          icon:           Icon(Icons.dashboard_outlined),
-          selectedIcon:   Icon(Icons.dashboard),
-          label:          'Dashboard',
+          icon:         Icon(Icons.dashboard_outlined),
+          selectedIcon: Icon(Icons.dashboard),
+          label:        'Dashboard',
         ),
       const NavigationDestination(
-        icon:           Icon(Icons.computer_outlined),
-        selectedIcon:   Icon(Icons.computer),
-        label:          'Équipements',
+        icon:         Icon(Icons.computer_outlined),
+        selectedIcon: Icon(Icons.computer),
+        label:        'Équipements',
       ),
       const NavigationDestination(
-        icon:           Icon(Icons.event_outlined),
-        selectedIcon:   Icon(Icons.event),
-        label:          'Réservations',
+        icon:         Icon(Icons.event_outlined),
+        selectedIcon: Icon(Icons.event),
+        label:        'Réservations',
       ),
       const NavigationDestination(
-        icon:           Icon(Icons.warning_amber_outlined),
-        selectedIcon:   Icon(Icons.warning_amber),
-        label:          'Incidents',
+        icon:         Icon(Icons.warning_amber_outlined),
+        selectedIcon: Icon(Icons.warning_amber),
+        label:        'Incidents',
       ),
       const NavigationDestination(
-        icon:           Icon(Icons.person_outline),
-        selectedIcon:   Icon(Icons.person),
-        label:          'Profil',
+        icon:         Icon(Icons.person_outline),
+        selectedIcon: Icon(Icons.person),
+        label:        'Profil',
       ),
     ];
   }
@@ -78,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: pages,
       ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex:    safeIndex,
+        selectedIndex: safeIndex,
         onDestinationSelected: (index) {
           setState(() => _currentIndex = index);
         },
@@ -93,6 +103,8 @@ class _HomeScreenState extends State<HomeScreen> {
  
 // ─── Page Profil ──────────────────────────────────────────────
 class _ProfilePage extends StatelessWidget {
+  const _ProfilePage();
+ 
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().user;
@@ -114,8 +126,8 @@ class _ProfilePage extends StatelessWidget {
                     ? user!.prenom[0].toUpperCase()
                     : '?',
                 style: const TextStyle(
-                    fontSize: 36,
-                    color: Colors.white,
+                    fontSize:   36,
+                    color:      Colors.white,
                     fontWeight: FontWeight.bold),
               ),
             ),
@@ -130,13 +142,14 @@ class _ProfilePage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color:        AppColors.primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 user?.role.toUpperCase() ?? '',
                 style: const TextStyle(
-                    color: AppColors.primary, fontWeight: FontWeight.bold),
+                    color:      AppColors.primary,
+                    fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 8),
@@ -153,25 +166,25 @@ class _ProfilePage extends StatelessWidget {
                   ListTile(
                     leading: const Icon(Icons.person_outline,
                         color: AppColors.primary),
-                    title: const Text('Modifier mon profil'),
+                    title:   const Text('Modifier mon profil'),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {},
+                    onTap:   () {},
                   ),
                   const Divider(height: 1),
                   ListTile(
                     leading: const Icon(Icons.lock_outline,
                         color: AppColors.primary),
-                    title: const Text('Changer mon mot de passe'),
+                    title:   const Text('Changer mon mot de passe'),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {},
+                    onTap:   () {},
                   ),
                   const Divider(height: 1),
                   ListTile(
                     leading: const Icon(Icons.history,
                         color: AppColors.primary),
-                    title: const Text('Historique de réservations'),
+                    title:   const Text('Historique de réservations'),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {},
+                    onTap:   () {},
                   ),
                 ],
               ),
@@ -185,7 +198,7 @@ class _ProfilePage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.error,
                 ),
-                icon: const Icon(Icons.logout),
+                icon:  const Icon(Icons.logout),
                 label: const Text(AppStrings.logout),
                 onPressed: () async {
                   await context.read<AuthProvider>().logout();
