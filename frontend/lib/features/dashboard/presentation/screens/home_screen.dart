@@ -7,6 +7,7 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../equipements/presentation/screens/equipements_screen.dart';
 import '../../../reservations/presentation/screens/mes_reservations_screen.dart';
 import '../../../incidents/presentation/screens/incidents_screen.dart';
+import '../../../users/presentation/screens/users_screen.dart';
 import 'admin_dashboard_screen.dart';
  
 // ─────────────────────────────────────────────────────────────────────────────
@@ -36,6 +37,7 @@ class HomeScreenState extends State<HomeScreen> {
       const EquipementsScreen(),
       const MesReservationsScreen(),
       const IncidentsScreen(),
+      if (isAdmin) const UsersScreen(),
       const _ProfilePage(),
     ];
   }
@@ -64,6 +66,12 @@ class HomeScreenState extends State<HomeScreen> {
         selectedIcon: Icon(Icons.warning_amber),
         label:        'Incidents',
       ),
+      if (isAdmin)
+        const NavigationDestination(
+          icon:         Icon(Icons.people_outline),
+          selectedIcon: Icon(Icons.people),
+          label:        'Utilisateurs',
+        ),
       const NavigationDestination(
         icon:         Icon(Icons.person_outline),
         selectedIcon: Icon(Icons.person),
