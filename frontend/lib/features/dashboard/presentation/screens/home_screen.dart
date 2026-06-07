@@ -1,5 +1,5 @@
+
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
@@ -8,6 +8,7 @@ import '../../../equipements/presentation/screens/equipements_screen.dart';
 import '../../../reservations/presentation/screens/mes_reservations_screen.dart';
 import '../../../incidents/presentation/screens/incidents_screen.dart';
 import '../../../users/presentation/screens/users_screen.dart';
+import '../../../profile/presentation/screens/profile_screen.dart';
 import 'admin_dashboard_screen.dart';
  
 // ─────────────────────────────────────────────────────────────────────────────
@@ -38,7 +39,7 @@ class HomeScreenState extends State<HomeScreen> {
       const MesReservationsScreen(),
       const IncidentsScreen(),
       if (isAdmin) const UsersScreen(),
-      const _ProfilePage(),
+      const ProfileScreen(),
     ];
   }
  
@@ -110,114 +111,4 @@ class HomeScreenState extends State<HomeScreen> {
 }
  
 // ─── Page Profil ──────────────────────────────────────────────
-class _ProfilePage extends StatelessWidget {
-  const _ProfilePage();
- 
-  @override
-  Widget build(BuildContext context) {
-    final user = context.watch<AuthProvider>().user;
- 
-    return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.profil)),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const SizedBox(height: 16),
- 
-            // ─── Avatar ───────────────────────────────────
-            CircleAvatar(
-              radius: 50,
-              backgroundColor: AppColors.primaryDark,
-              child: Text(
-                user?.prenom.isNotEmpty == true
-                    ? user!.prenom[0].toUpperCase()
-                    : '?',
-                style: const TextStyle(
-                    fontSize:   36,
-                    color:      Colors.white,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 16),
- 
-            // ─── Nom et rôle ──────────────────────────────
-            Text(
-              user?.fullName ?? '',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                color:        AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                user?.role.toUpperCase() ?? '',
-                style: const TextStyle(
-                    color:      AppColors.primary,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              user?.email ?? '',
-              style: const TextStyle(color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 32),
- 
-            // ─── Options ──────────────────────────────────
-            Card(
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.person_outline,
-                        color: AppColors.primary),
-                    title:   const Text('Modifier mon profil'),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap:   () {},
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.lock_outline,
-                        color: AppColors.primary),
-                    title:   const Text('Changer mon mot de passe'),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap:   () {},
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.history,
-                        color: AppColors.primary),
-                    title:   const Text('Historique de réservations'),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap:   () {},
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
- 
-            // ─── Déconnexion ──────────────────────────────
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.error,
-                ),
-                icon:  const Icon(Icons.logout),
-                label: const Text(AppStrings.logout),
-                onPressed: () async {
-                  await context.read<AuthProvider>().logout();
-                  if (context.mounted) context.go('/login');
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
  

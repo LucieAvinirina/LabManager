@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../data/models/user_model.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../../../core/storage/secure_storage.dart';
+import '../../../notifications/services/notification_service.dart';
  
 // États possibles du module Auth
 enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
@@ -62,6 +63,10 @@ class AuthProvider extends ChangeNotifier {
  
       _user   = result['user'] as UserModel;
       _status = AuthStatus.authenticated;
+      // Sauvegarder le token FCM après connexion
+        try {
+        await NotificationService().saveFcmToken();
+        } catch (_) {}
       notifyListeners();
       return true;
  

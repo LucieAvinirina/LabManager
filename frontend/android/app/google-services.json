@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "45625433093",
+    "project_id": "labmanager-496a8",
+    "storage_bucket": "labmanager-496a8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:45625433093:android:5c75c2fe89503e0621d06c",
+        "android_client_info": {
+          "package_name": "com.example.frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyziCg2SKAs3p4eI4tCj3QUwc0KYBfFxk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

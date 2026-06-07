@@ -8,6 +8,7 @@ import 'features/reservations/presentation/providers/reservations_provider.dart'
 import 'features/incidents/presentation/providers/incidents_provider.dart';
 import 'features/dashboard/presentation/providers/dashboard_provider.dart';
 import 'features/users/presentation/providers/users_provider.dart';
+import 'features/profile/presentation/providers/profile_provider.dart';
 import 'package:intl/date_symbol_data_local.dart'; // ← AJOUTER cet import
  
 void main() async {
@@ -30,9 +31,9 @@ void main() async {
         ChangeNotifierProvider(create: (_) => IncidentsProvider()),
         ChangeNotifierProvider(create: (_) => DashboardProvider()),
         ChangeNotifierProvider(create: (_) => UsersProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
       ],
       child: const LabManagerApp(),
     ),
   );
 }
- 
