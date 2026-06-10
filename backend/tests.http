@@ -1,6 +1,6 @@
 ### ─── Variables ─────────────────────────────────────────────
 @baseUrl = http://localhost:3000/api
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJqb2N5QGdtYWlsLmNvbSIsInJvbGUiOiJldHVkaWFudCIsImlhdCI6MTc3OTY2NjA1NiwiZXhwIjoxNzgwMjcwODU2fQ.ynH6kBhhzyEedaTQjIRtz7N1U_qydnArrILg3v_Vr44
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgwOTc0NTU3LCJleHAiOjE3ODE1NzkzNTd9.15qkkgsd6ibLi3udzFHaSw-ES7wXENSt9yhD7XSTT5M
 ### ─── TEST 1 : Vérifier que le serveur tourne ───────────────
 GET http://localhost:3000
 
@@ -180,7 +180,7 @@ Content-Type: application/json
 }
 
 ### ─── TEST 23 : Valider une réservation (admin) ─────────────
-PATCH {{baseUrl}}/reservations/1/valider
+PATCH {{baseUrl}}/reservations/9/valider
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -437,6 +437,38 @@ Authorization: Bearer {{token}}
 ### ─── TEST 57 : Export CSV des réservations ─────────────────
 GET {{baseUrl}}/rapports/export/csv?date_debut=2026-01-01&date_fin=2026-12-31
 Authorization: Bearer {{token}}
+
+
+### ─── TEST NOTIFICATION — Envoyer à un utilisateur ──────
+POST {{baseUrl}}/notifications/user
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id_utilisateur": 3,
+  "title": "✅ Réservation confirmée",
+  "body": "Votre réservation du 10/06/2026 a été validée par l'administrateur.",
+  "data": {
+    "type": "reservation",
+    "id_reservation": "1"
+  }
+}
+
+### ─── TEST NOTIFICATION — Envoyer à tous ────────────────
+POST {{baseUrl}}/notifications/all
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "⚠️ Information importante",
+  "body": "Le laboratoire sera fermé demain pour maintenance.",
+  "data": {
+    "type": "annonce"
+    
+  }
+}
+
+
 
 
 

@@ -8,7 +8,12 @@ const app = express();
  
 // ─── Middlewares globaux ───────────────────────────────────────────────────────
 app.use(helmet());         // Sécurité HTTP
-app.use(cors());           // Autorise Flutter à appeler l'API
+
+app.use(cors({    // Autorise Flutter à appeler l'API
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));         
 app.use(morgan('dev'));    // Log des requêtes dans le terminal
 app.use(express.json());   // Parser le body JSON
  
