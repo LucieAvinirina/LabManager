@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -6,6 +5,7 @@ import '../../../../core/constants/app_strings.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../equipements/presentation/screens/equipements_screen.dart';
 import '../../../reservations/presentation/screens/mes_reservations_screen.dart';
+import '../../../reservations/presentation/screens/planning_screen.dart';
 import '../../../incidents/presentation/screens/incidents_screen.dart';
 import '../../../users/presentation/screens/users_screen.dart';
 import '../../../profile/presentation/screens/profile_screen.dart';
@@ -36,7 +36,7 @@ class HomeScreenState extends State<HomeScreen> {
     return [
       if (isAdmin) const AdminDashboardScreen(),
       const EquipementsScreen(),
-      const MesReservationsScreen(),
+      const MesReservationsScreen(), // ← liste + historique restaurés
       const IncidentsScreen(),
       if (isAdmin) const UsersScreen(),
       const ProfileScreen(),
@@ -111,4 +111,3 @@ class HomeScreenState extends State<HomeScreen> {
 }
  
 // ─── Page Profil ──────────────────────────────────────────────
- 

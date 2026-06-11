@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../providers/reservations_provider.dart';
 import '../../data/models/reservation_model.dart';
+import 'planning_screen.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import 'reservation_form_screen.dart';
  
@@ -62,6 +63,17 @@ class _MesReservationsScreenState extends State<MesReservationsScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Réservations'),
+        actions: [
+          // ─── Bouton ouvrir le calendrier interactif ──────
+          IconButton(
+            icon:    const Icon(Icons.calendar_month_outlined),
+            tooltip: 'Voir le calendrier',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PlanningScreen()),
+            ),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           labelColor: Colors.white,
