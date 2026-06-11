@@ -15,7 +15,7 @@ router.get('/historique', verifyToken, reservationsController.getHistorique);
 router.get('/:id', verifyToken, reservationsController.getById);
  
 // POST /api/reservations → Créer une réservation
-// ✅ Tous les rôles peuvent créer une réservation (etudiant, enseignant, admin)
+// Tous les rôles peuvent créer une réservation (etudiant, enseignant, admin)
 router.post('/', verifyToken, requireRole('etudiant', 'enseignant', 'admin'), reservationsController.create);
  
 // PATCH /api/reservations/:id/valider → Confirmer ou refuser (admin seulement)

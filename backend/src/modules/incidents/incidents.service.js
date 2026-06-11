@@ -29,7 +29,7 @@ const getAll = async (filters = {}, user) => {
   let paramIndex = 1;
  
   // Un étudiant ne voit que ses propres incidents
-  if (user.role === 'etudiant') {
+  if (user.role === 'etudiant' || user.role === 'enseignant') {
     query += ` AND i.id_utilisateur = $${paramIndex++}`;
     params.push(user.id);
   }
@@ -74,7 +74,7 @@ const getById = async (id, user) => {
   const incident = result.rows[0];
  
   // Un étudiant ne voit que ses propres incidents
-  if (user.role === 'etudiant' && incident.id_utilisateur !== user.id) {
+  if ((user.role === 'etudiant' || user.role === 'enseignant') && incident.id_utilisateur !== user.id) {
     throw new Error('ACCES_REFUSE');
   }
  

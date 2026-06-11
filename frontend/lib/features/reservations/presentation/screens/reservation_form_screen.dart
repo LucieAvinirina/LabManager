@@ -233,7 +233,9 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
                     }
  
                     final ordinateurs = eqProvider.equipements
-                        .where((e) => e.type == 'ordinateur')
+                        .where((e) =>
+                            e.type == 'ordinateur' ||
+                            e.type == 'ordinateur de bureau')
                         .toList();
  
                     if (ordinateurs.isEmpty) {
@@ -395,4 +397,3 @@ class _ReservationFormScreenState extends State<ReservationFormScreen> {
     );
   }
 }
- 

@@ -87,7 +87,8 @@ class EquipementDetailScreen extends StatelessWidget {
                     if (equipement.numeroSerie != null)
                       _infoRow(Icons.qr_code, 'N° Série', equipement.numeroSerie!),
                     if (equipement.dateAcquisition != null)
-                      _infoRow(Icons.calendar_today_outlined, 'Acquisition', equipement.dateAcquisition!),
+                      _infoRow(Icons.calendar_today_outlined, 'Acquisition',
+                          _formatDate(equipement.dateAcquisition!)),
                     if (equipement.description != null)
                       _infoRow(Icons.notes_outlined, 'Description', equipement.description!),
                   ],
@@ -157,6 +158,18 @@ class EquipementDetailScreen extends StatelessWidget {
   }
  
   // ─── Ligne d'information ──────────────────────────────────
+  // ─── Formater la date d'acquisition lisiblement ───────────
+  String _formatDate(String raw) {
+    try {
+      final dt = DateTime.parse(raw).toLocal();
+      return '${dt.day.toString().padLeft(2,'0')}/'
+             '${dt.month.toString().padLeft(2,'0')}/'
+             '${dt.year}';
+    } catch (_) {
+      return raw;
+    }
+  }
+ 
   Widget _infoRow(IconData icon, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),

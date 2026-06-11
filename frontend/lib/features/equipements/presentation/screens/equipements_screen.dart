@@ -51,6 +51,20 @@ class _EquipementsScreenState extends State<EquipementsScreen> {
       ),
       body: Column(
         children: [
+          // ─── Bandeau alerte équipements critiques (admin) ─
+          Consumer2<EquipementsProvider, AuthProvider>(
+            builder: (_, eqProv, authProv, __) {
+              if (!(authProv.user?.isAdmin ?? false)) return const SizedBox.shrink();
+              final pannes = eqProv.equipements
+                  .where((e) => e.statut == 'En panne').length;
+              final maintenances = eqProv.equipements
+                  .where((e) => e.statut == 'En maintenance').length;
+              if (pannes == 0 && maintenances == 0) return const SizedBox.shrink();
+              return _AlerteEquipementsBanner(
+                  pannes: pannes, maintenances: maintenances);
+            },
+          ),
+
           // ─── Filtres rapides par statut ──────────────────
           _buildStatutChips(),
  
@@ -285,61 +299,271 @@ Widget _buildStatutChips() {
   // ─── Dialogue ajouter équipement (admin) ───────────────────
   void _showAddDialog(BuildContext context) {
     final nomCtrl  = TextEditingController();
-    final typeCtrl = TextEditingController();
     final snCtrl   = TextEditingController();
     final descCtrl = TextEditingController();
- 
+    String? selectedType;
+    DateTime? selectedDate;
+
+    // Types d'équipements définis
+    const types = [
+      'ordinateur',
+      'ordinateur de bureau',
+      'vidéoprojecteur',
+      'imprimante',
+      'switch',
+      'câble réseau',
+      'autre',
+    ];
+
+    // Descriptions préremplies selon le type
+    String descriptionPourType(String type) {
+      switch (type) {
+        case 'ordinateur':          return 'Poste de travail standard';
+        case 'ordinateur de bureau': return 'Poste de travail fixe';
+        case 'vidéoprojecteur':     return 'Vidéoprojecteur de salle';
+        case 'imprimante':          return 'Imprimante partagée';
+        case 'switch':              return 'Switch réseau 24 ports';
+        case 'câble réseau':        return 'Câble réseau Cat6';
+        default: return '';
+      }
+    }
+
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Ajouter un équipement'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(controller: nomCtrl,
-                  decoration: const InputDecoration(labelText: 'Nom *')),
-              const SizedBox(height: 12),
-              TextField(controller: typeCtrl,
-                  decoration: const InputDecoration(labelText: 'Type *')),
-              const SizedBox(height: 12),
-              TextField(controller: snCtrl,
-                  decoration: const InputDecoration(labelText: 'Numéro de série')),
-              const SizedBox(height: 12),
-              TextField(controller: descCtrl,
-                  decoration: const InputDecoration(labelText: 'Description')),
-            ],
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setStateDialog) => AlertDialog(
+          title: const Text('Ajouter un équipement'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ─── Nom ─────────────────────────────────
+                TextField(
+                  controller: nomCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Nom *',
+                    hintText:  'Ex : PC_07, Projecteur_02…',
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // ─── Type (dropdown) ──────────────────────
+                const Text('Type *',
+                    style: TextStyle(fontSize: 12, color: Colors.grey)),
+                const SizedBox(height: 4),
+                DropdownButtonFormField<String>(
+                  value: selectedType,
+                  hint: const Text('Sélectionner un type'),
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 8),
+                  ),
+                  items: types.map((t) => DropdownMenuItem(
+                    value: t,
+                    child: Text(t[0].toUpperCase() + t.substring(1)),
+                  )).toList(),
+                  onChanged: (val) {
+                    setStateDialog(() {
+                      selectedType = val;
+                      if (val != null && descCtrl.text.isEmpty) {
+                        descCtrl.text = descriptionPourType(val);
+                      }
+                    });
+                  },
+                ),
+                const SizedBox(height: 12),
+
+                // ─── Numéro de série ──────────────────────
+                TextField(
+                  controller: snCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Numéro de série',
+                    hintText:  'Ex : SN-PC-007',
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // ─── Date d'acquisition ───────────────────
+                const Text('Date d\'acquisition',
+                    style: TextStyle(fontSize: 12, color: Colors.grey)),
+                const SizedBox(height: 4),
+                InkWell(
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context:     context, // contexte extérieur au dialog
+                      initialDate: selectedDate ?? DateTime.now(),
+                      firstDate:   DateTime(2000),
+                      lastDate:    DateTime.now(),
+                    );
+                    if (picked != null) {
+                      setStateDialog(() => selectedDate = picked);
+                    }
+                  },
+                  child: Container(
+                    width:   double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 14),
+                    decoration: BoxDecoration(
+                      border:       Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.calendar_today_outlined,
+                            size: 16, color: Colors.grey),
+                        const SizedBox(width: 8),
+                        Text(
+                          selectedDate != null
+                              ? '${selectedDate!.day.toString().padLeft(2,'0')}/'
+                                '${selectedDate!.month.toString().padLeft(2,'0')}/'
+                                '${selectedDate!.year}'
+                              : 'Choisir une date',
+                          style: TextStyle(
+                            color: selectedDate != null
+                                ? Colors.black87
+                                : Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // ─── Description ──────────────────────────
+                TextField(
+                  controller: descCtrl,
+                  maxLines:   2,
+                  decoration: const InputDecoration(
+                    labelText: 'Description',
+                    hintText:  'Détails sur l\'équipement',
+                  ),
+                ),
+              ],
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Annuler'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
+              ),
+              onPressed: () async {
+                if (nomCtrl.text.trim().isEmpty || selectedType == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Le nom et le type sont obligatoires'),
+                    backgroundColor: AppColors.error,
+                  ));
+                  return;
+                }
+                final success =
+                    await context.read<EquipementsProvider>().create({
+                  'nom':              nomCtrl.text.trim(),
+                  'type':             selectedType,
+                  'numero_serie':     snCtrl.text.trim(),
+                  'description':      descCtrl.text.trim(),
+                  'date_acquisition': selectedDate != null
+                      ? '${selectedDate!.year}-'
+                        '${selectedDate!.month.toString().padLeft(2,'0')}-'
+                        '${selectedDate!.day.toString().padLeft(2,'0')}'
+                      : null,
+                });
+                if (context.mounted) {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(success
+                        ? 'Équipement ajouté avec succès !'
+                        : context.read<EquipementsProvider>().errorMessage),
+                    backgroundColor:
+                        success ? AppColors.available : AppColors.error,
+                  ));
+                }
+              },
+              child: const Text('Ajouter'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
+      ),
+    );
+  }
+}
+ 
+// ─── Widget : Bandeau alerte équipements critiques ────────────────────────────
+class _AlerteEquipementsBanner extends StatelessWidget {
+  final int pannes;
+  final int maintenances;
+ 
+  const _AlerteEquipementsBanner({
+    required this.pannes,
+    required this.maintenances,
+  });
+ 
+  @override
+  Widget build(BuildContext context) {
+    final hasPannes      = pannes > 0;
+    final hasMaint       = maintenances > 0;
+    final color          = hasPannes ? AppColors.error : AppColors.warningDark;
+ 
+    return Container(
+      width:   double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color:  color.withOpacity(0.08),
+        border: Border(bottom: BorderSide(color: color.withOpacity(0.3))),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            hasPannes ? Icons.warning_rounded : Icons.build_circle_outlined,
+            color: color,
+            size:  20,
           ),
-          ElevatedButton(
-            onPressed: () async {
-              if (nomCtrl.text.isEmpty || typeCtrl.text.isEmpty) return;
-              final success = await context.read<EquipementsProvider>().create({
-                'nom':         nomCtrl.text.trim(),
-                'type':        typeCtrl.text.trim(),
-                'numero_serie': snCtrl.text.trim(),
-                'description': descCtrl.text.trim(),
-              });
-              if (context.mounted) {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(success
-                      ? 'Équipement ajouté !'
-                      : 'Erreur : ${context.read<EquipementsProvider>().errorMessage}'),
-                  backgroundColor: success ? AppColors.available : AppColors.error,
-                ));
-              }
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  hasPannes && hasMaint
+                      ? 'Équipements critiques nécessitent votre attention'
+                      : hasPannes
+                          ? 'Équipements en panne détectés'
+                          : 'Équipements en maintenance',
+                  style: TextStyle(
+                    color:      color,
+                    fontWeight: FontWeight.bold,
+                    fontSize:   13,
+                  ),
+                ),
+                Text(
+                  [
+                    if (hasPannes)
+                      '$pannes en panne',
+                    if (hasMaint)
+                      '$maintenances en maintenance',
+                  ].join(' · '),
+                  style: TextStyle(color: color, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              // Filtrer directement sur "En panne"
+              final provider = context.read<EquipementsProvider>();
+              provider.setFilter(statut: hasPannes ? 'En panne' : 'En maintenance');
             },
-            child: const Text('Ajouter'),
+            style: TextButton.styleFrom(foregroundColor: color),
+            child: const Text('Voir', style: TextStyle(fontSize: 12)),
           ),
         ],
       ),
     );
   }
 }
- 

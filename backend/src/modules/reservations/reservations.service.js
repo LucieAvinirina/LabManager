@@ -1,4 +1,3 @@
-
 const pool = require('../../config/db');
 const notificationsService = require('../notifications/notifications.service');
 
@@ -76,7 +75,7 @@ const getAll = async (filters = {}, user) => {
   let paramIndex = 1;
  
   // Un étudiant ou enseignant ne voit que ses propres réservations
-  if (user.role === 'etudiant') {
+  if (user.role === 'etudiant' || user.role === 'enseignant') {
     query += ` AND r.id_utilisateur = $${paramIndex++}`;
     params.push(user.id);
   }
@@ -130,8 +129,8 @@ const getById = async (id, user) => {
  
   const reservation = result.rows[0];
  
-  // Un étudiant ne peut voir que ses propres réservations
-  if (user.role === 'etudiant' && reservation.id_utilisateur !== user.id) {
+  // Un étudiant ou enseignant ne peut voir que ses propres réservations
+  if ((user.role === 'etudiant' || user.role === 'enseignant') && reservation.id_utilisateur !== user.id) {
     throw new Error('ACCES_REFUSE');
   }
  
