@@ -1,7 +1,6 @@
 ### ─── Variables ─────────────────────────────────────────────
 @baseUrl = http://localhost:3000/api
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgwOTc0NTU3LCJleHAiOjE3ODE1NzkzNTd9.15qkkgsd6ibLi3udzFHaSw-ES7wXENSt9yhD7XSTT5M
-### ─── TEST 1 : Vérifier que le serveur tourne ───────────────
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgyNTY2NTcyLCJleHAiOjE3ODMxNzEzNzJ9.PFMHio6UfePmSQ3be434T-8P1eOp6xwqofjki0pDmeg
 GET http://localhost:3000
 
 ### ─── TEST 2 : Inscription étudiant ────────────────────────
@@ -318,12 +317,12 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "id_utilisateur": 3,
+  "id_utilisateur": 12,
   "title": "Votre réservation est confirmée",
-  "body": "Votre réservation du 01/06/2026 à 08h00 a été validée.",
+  "body": "Votre réservation  a été validée.",
   "data": {
     "type": "reservation",
-    "id_reservation": "1"
+    "id_reservation": "13"
   }
 }
 
